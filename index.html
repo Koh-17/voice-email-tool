@@ -5,225 +5,236 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音声メール返信ツール</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 10px;
+            padding: 20px;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        .header { text-align: center; margin-bottom: 40px; }
         .header h1 {
-            font-size: 2em;
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
             background: linear-gradient(45deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
         }
-
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 30px;
+            margin-bottom: 30px;
         }
-
         .section {
             background: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
         .section h2 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
         }
-
         .email-input, .response-text {
             width: 100%;
-            min-height: 120px;
-            padding: 10px;
+            min-height: 150px;
+            padding: 15px;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             resize: vertical;
         }
-
         .voice-controls {
             display: flex;
             flex-direction: column;
+            gap: 15px;
             align-items: center;
-            gap: 10px;
         }
-
         .voice-btn {
             background: linear-gradient(45deg, #ff6b6b, #ee5a52);
             color: white;
-            padding: 12px 20px;
+            border: none;
+            padding: 15px 30px;
             border-radius: 50px;
             font-size: 16px;
             cursor: pointer;
-            border: none;
-            width: 100%;
-            max-width: 250px;
+            min-width: 200px;
         }
-
-        .voice-status {
-            padding: 8px;
-            font-size: 14px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .response-area {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-        }
-
+        .voice-status { text-align: center; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; }
+        .voice-status.listening { background: rgba(255,107,107,0.1); color: #ff4757; }
+        .voice-status.processing { background: rgba(255,193,7,0.1); color: #ff9f00; }
+        .voice-status.ready { background: rgba(34,197,94,0.1); color: #22c55e; }
+        .recognized-text { background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .hidden { display: none; }
         .action-buttons {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            margin-top: 20px;
             justify-content: center;
-            margin-top: 15px;
+            flex-wrap: wrap;
         }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            cursor: pointer;
-            border: none;
-            flex: 1;
-            min-width: 120px;
-            max-width: 200px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(45deg, #11998e, #38ef7d);
-            color: white;
-        }
-
-        /* ✅ スマホ対応 */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 1.6em;
-            }
-
-            .voice-btn {
-                font-size: 15px;
-                padding: 10px 16px;
-            }
-
-            .btn {
-                width: 100%;
-                font-size: 15px;
-            }
-
-            .email-input, .response-text {
-                min-height: 100px;
-                font-size: 13px;
-            }
-        }
+        .btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+        .btn-secondary { background: linear-gradient(45deg, #11998e, #38ef7d); color: white; }
+        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- ここは既存のHTML -->
-
-    </div>
-
-    <!-- ✅ デバッグ用スクリプト -->
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const status = document.createElement('div');
-        status.style.background = '#fff';
-        status.style.padding = '10px';
-        status.style.margin = '10px';
-        status.style.border = '2px solid #000';
-        status.style.fontWeight = 'bold';
-        document.body.prepend(status);
-
-        if ('webkitSpeechRecognition' in window) {
-            status.innerText = '✅ webkitSpeechRecognition が使えます';
-        } else if ('SpeechRecognition' in window) {
-            status.innerText = '✅ SpeechRecognition が使えます';
-        } else {
-            status.innerText = '❌ このブラウザは音声認識をサポートしていません';
-        }
-    });
-    </script>
-
-    </div>
     <div class="container">
         <div class="header">
             <h1>🎤 音声メール返信ツール</h1>
             <p>受信メールを入力し、音声で返信内容を指示してください</p>
         </div>
-
         <div class="main-content">
             <div class="section">
                 <h2>📧 受信メール</h2>
-                <textarea class="email-input" id="receivedEmail" placeholder="受信したメールをここに貼り付けてください..."></textarea>
+                <textarea id="receivedEmail" class="email-input" placeholder="受信メールをここに入力"></textarea>
             </div>
-
             <div class="section">
                 <h2>🎤 音声指示</h2>
                 <div class="voice-controls">
                     <button class="voice-btn" id="voiceBtn">音声録音を開始</button>
-                    <div class="voice-status" id="voiceStatus">準備完了</div>
+                    <div class="voice-status ready" id="voiceStatus">準備完了</div>
                     <div class="recognized-text hidden" id="recognizedText"></div>
                 </div>
             </div>
         </div>
-
         <div class="response-area">
             <h2>✉️ 生成された返信メール</h2>
-            <textarea class="response-text" id="responseText" placeholder="自動生成された返信メールが表示されます" readonly></textarea>
+            <textarea id="responseText" class="response-text" placeholder="返信メールがここに表示されます" readonly></textarea>
             <div class="action-buttons">
                 <button class="btn btn-primary" id="generateBtn">返信を生成</button>
-                <button class="btn btn-secondary" id="speakBtn">音声で読み上げ</button>
+                <button class="btn btn-secondary" id="speakBtn">返信を音声で読み上げ</button>
                 <button class="btn btn-primary" id="copyBtn">コピー</button>
             </div>
         </div>
     </div>
 
-    <!-- ✅ JSはそのまま適用可能 -->
     <script>
-        /* ここにあなたの VoiceEmailTool クラスをそのまま入れてOK */
+        class VoiceEmailTool {
+            constructor() {
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                this.isRecording = false;
+                this.recognizedCommand = '';
+                this.initElements();
+                this.initSpeechRecognition();
+                this.bindEvents();
+            }
+
+            initElements() {
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.voiceStatus = document.getElementById('voiceStatus');
+                this.recognizedText = document.getElementById('recognizedText');
+                this.receivedEmail = document.getElementById('receivedEmail');
+                this.responseText = document.getElementById('responseText');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.speakBtn = document.getElementById('speakBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+            }
+
+            initSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                } else if ('SpeechRecognition' in window) {
+                    this.recognition = new SpeechRecognition();
+                }
+
+                if (this.recognition) {
+                    this.recognition.lang = 'ja-JP';
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+
+                    this.recognition.onstart = () => {
+                        console.log('🎤 録音開始イベントが発火しました');
+                        this.isRecording = true;
+                        this.updateVoiceStatus('listening', '音声を聞いています...');
+                        this.voiceBtn.textContent = '録音を停止';
+                        this.voiceBtn.classList.add('recording');
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        console.log('✅ onresult発火', event.results);
+                        let transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            transcript += event.results[i][0].transcript;
+                        }
+                        if (event.results[event.results.length - 1].isFinal) {
+                            console.log('🎤 最終認識結果:', transcript);
+                            this.recognizedCommand = transcript;
+                            this.displayRecognizedText(transcript);
+                        }
+                    };
+
+                    this.recognition.onend = () => {
+                        console.log('🛑 録音終了イベント');
+                        this.isRecording = false;
+                        this.updateVoiceStatus('ready', '準備完了');
+                        this.voiceBtn.textContent = '音声録音を開始';
+                        this.voiceBtn.classList.remove('recording');
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('❌ 音声認識エラー', event.error);
+                        this.updateVoiceStatus('ready', 'エラーが発生しました');
+                        this.isRecording = false;
+                        this.voiceBtn.textContent = '音声録音を開始';
+                        this.voiceBtn.classList.remove('recording');
+                    };
+                } else {
+                    console.warn('❌ 音声認識が使えません');
+                    this.voiceBtn.disabled = true;
+                }
+            }
+
+            bindEvents() {
+                this.voiceBtn.addEventListener('click', () => {
+                    if (this.isRecording) {
+                        this.recognition.stop();
+                    } else {
+                        console.log('▶️ startRecording() 呼び出し');
+                        this.startRecording();
+                    }
+                });
+            }
+
+            startRecording() {
+                if (this.recognition) {
+                    this.recognizedCommand = '';
+                    this.recognizedText.classList.add('hidden');
+                    this.recognition.start();
+                }
+            }
+
+            updateVoiceStatus(type, message) {
+                this.voiceStatus.className = `voice-status ${type}`;
+                this.voiceStatus.textContent = message;
+            }
+
+            displayRecognizedText(text) {
+                this.recognizedText.textContent = `認識された指示: "${text}"`;
+                this.recognizedText.classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceEmailTool();
+        });
     </script>
 </body>
 </html>
