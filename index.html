@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音声メール返信ツール</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴシック Pro W3', Meiryo, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -21,7 +27,12 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        .header { text-align: center; margin-bottom: 40px; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
         .header h1 {
             color: #333;
             font-size: 2.5em;
@@ -30,19 +41,43 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
         }
+        
         .section {
             background: white;
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
         }
-        .email-input, .response-text {
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon {
+            font-size: 1.2em;
+        }
+        
+        .email-input {
             width: 100%;
             min-height: 150px;
             padding: 15px;
@@ -50,8 +85,21 @@
             border-radius: 10px;
             font-size: 14px;
             resize: vertical;
+            transition: border-color 0.3s ease;
         }
-        .voice-controls { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        
+        .email-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .voice-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        
         .voice-btn {
             background: linear-gradient(45deg, #ff6b6b, #ee5a52);
             color: white;
@@ -60,19 +108,221 @@
             border-radius: 50px;
             font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
             min-width: 200px;
         }
-        .voice-status { text-align: center; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; }
-        .voice-status.listening { background: rgba(255,107,107,0.1); color: #ff4757; }
-        .voice-status.processing { background: rgba(255,193,7,0.1); color: #ff9f00; }
-        .voice-status.ready { background: rgba(34,197,94,0.1); color: #22c55e; }
-        .recognized-text { background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; margin-top: 15px; }
-        .hidden { display: none; }
-        .action-buttons { display: flex; gap: 15px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
-        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
-        .btn-secondary { background: linear-gradient(45deg, #11998e, #38ef7d); color: white; }
-        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
+        
+        .voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .voice-btn:active {
+            transform: translateY(0);
+        }
+        
+        .voice-btn.recording {
+            background: linear-gradient(45deg, #ff4757, #c44569);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .voice-status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-status.listening {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff4757;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .voice-status.processing {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ff9f00;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .voice-status.ready {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .response-area {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .response-area h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #subjectInput {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        
+        #subjectInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .response-text {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            background: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+        }
+        
+        .recognized-text {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .send-mail-section {
+            margin-top: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .send-mail-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .send-mail-section select,
+        .send-mail-section input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        
+        .send-mail-section select:focus,
+        .send-mail-section input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .send-mail-section button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .send-mail-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -81,13 +331,19 @@
             <h1>🎤 音声メール返信ツール</h1>
             <p>受信メールを入力し、音声で返信内容を指示してください</p>
         </div>
+        
         <div class="main-content">
             <div class="section">
-                <h2>📧 受信メール</h2>
-                <textarea id="receivedEmail" class="email-input" placeholder="受信メールをここに入力"></textarea>
+                <h2><span class="icon">📧</span>受信メール</h2>
+                <textarea 
+                    class="email-input" 
+                    id="receivedEmail" 
+                    placeholder="受信したメールの内容をここに貼り付けてください&#10;&#10;例：&#10;件名：会議の件について&#10;差出人：田中太郎&#10;内容：来週の会議についてですが、時間を変更させていただきたく..."
+                ></textarea>
             </div>
+            
             <div class="section">
-                <h2>🎤 音声指示</h2>
+                <h2><span class="icon">🎤</span>音声指示</h2>
                 <div class="voice-controls">
                     <button class="voice-btn" id="voiceBtn">音声録音を開始</button>
                     <div class="voice-status ready" id="voiceStatus">準備完了</div>
@@ -95,12 +351,39 @@
                 </div>
             </div>
         </div>
+        
         <div class="response-area">
-            <h2>✉️ 生成された返信メール</h2>
-            <textarea id="responseText" class="response-text" placeholder="返信メールがここに表示されます" readonly></textarea>
+            <h2><span class="icon">✉️</span>件名</h2>
+            <input type="text" id="subjectInput" placeholder="件名がここに表示されます" />
+            
+            <h2><span class="icon">✉️</span>生成された返信メール</h2>
+            <textarea 
+                class="response-text" 
+                id="responseText" 
+                placeholder="音声指示に基づいて自動生成された返信メールがここに表示されます"
+                readonly
+            ></textarea>
             <div class="action-buttons">
                 <button class="btn btn-primary" id="generateBtn">返信を生成</button>
+                <button class="btn btn-secondary" id="speakBtn">返信を音声で読み上げ</button>
+                <button class="btn btn-primary" id="copyBtn">クリップボードにコピー</button>
             </div>
+        </div>
+        
+        <div class="send-mail-section">
+            <h2><span class="icon">📤</span>メール送信リンク作成</h2>
+            <label for="mailClientSelect">メールアプリを選択してください：</label>
+            <select id="mailClientSelect">
+                <option value="gmail">Gmail</option>
+                <option value="outlook">Outlook</option>
+                <option value="applemail">Apple Mail (mailto)</option>
+                <option value="custom">カスタムURL</option>
+            </select>
+
+            <label for="customUrlInput" id="customUrlLabel" style="display:none;">カスタムURL（{{subject}} と {{body}} が使えます）</label>
+            <input type="text" id="customUrlInput" placeholder="例: https://example.com/send?subject={{subject}}&body={{body}}" style="display:none;" />
+
+            <button id="sendMailBtn">メールアプリを開く</button>
         </div>
     </div>
 
@@ -108,100 +391,320 @@
         class VoiceEmailTool {
             constructor() {
                 this.recognition = null;
+                this.synthesis = window.speechSynthesis;
                 this.isRecording = false;
                 this.recognizedCommand = '';
+                
                 this.initElements();
                 this.initSpeechRecognition();
                 this.bindEvents();
             }
-
+            
             initElements() {
                 this.voiceBtn = document.getElementById('voiceBtn');
                 this.voiceStatus = document.getElementById('voiceStatus');
                 this.recognizedText = document.getElementById('recognizedText');
                 this.receivedEmail = document.getElementById('receivedEmail');
                 this.responseText = document.getElementById('responseText');
+                this.subjectInput = document.getElementById('subjectInput');
                 this.generateBtn = document.getElementById('generateBtn');
+                this.speakBtn = document.getElementById('speakBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+                this.mailClientSelect = document.getElementById('mailClientSelect');
+                this.customUrlInput = document.getElementById('customUrlInput');
+                this.customUrlLabel = document.getElementById('customUrlLabel');
+                this.sendMailBtn = document.getElementById('sendMailBtn');
             }
-
+            
             initSpeechRecognition() {
                 if ('webkitSpeechRecognition' in window) {
                     this.recognition = new webkitSpeechRecognition();
                 } else if ('SpeechRecognition' in window) {
                     this.recognition = new SpeechRecognition();
                 }
-
+                
                 if (this.recognition) {
-                    this.recognition.lang = 'ja-JP';
                     this.recognition.continuous = false;
                     this.recognition.interimResults = true;
-
+                    this.recognition.lang = 'ja-JP';
+                    
+                    this.recognition.onstart = () => {
+                        this.isRecording = true;
+                        this.updateVoiceStatus('listening', '音声を聞いています...');
+                        this.voiceBtn.textContent = '録音を停止';
+                        this.voiceBtn.classList.add('recording');
+                    };
+                    
                     this.recognition.onresult = (event) => {
                         let transcript = '';
                         for (let i = event.resultIndex; i < event.results.length; i++) {
                             transcript += event.results[i][0].transcript;
                         }
+                        
                         if (event.results[event.results.length - 1].isFinal) {
                             this.recognizedCommand = transcript;
                             this.displayRecognizedText(transcript);
                         }
                     };
+                    
+                    this.recognition.onend = () => {
+                        this.isRecording = false;
+                        this.updateVoiceStatus('processing', '指示を処理中...');
+                        this.voiceBtn.textContent = '音声録音を開始';
+                        this.voiceBtn.classList.remove('recording');
+                        
+                        setTimeout(() => {
+                            this.updateVoiceStatus('ready', '準備完了');
+                        }, 1000);
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        this.updateVoiceStatus('ready', 'エラーが発生しました');
+                        this.isRecording = false;
+                        this.voiceBtn.textContent = '音声録音を開始';
+                        this.voiceBtn.classList.remove('recording');
+                    };
+                } else {
+                    this.updateVoiceStatus('ready', '音声認識がサポートされていません');
+                    this.voiceBtn.disabled = true;
                 }
             }
-
+            
             bindEvents() {
                 this.voiceBtn.addEventListener('click', () => {
                     if (this.isRecording) {
                         this.recognition.stop();
-                        this.isRecording = false;
                     } else {
                         this.startRecording();
                     }
                 });
-
+                
                 this.generateBtn.addEventListener('click', () => {
                     this.generateResponse();
                 });
-            }
+                
+                this.speakBtn.addEventListener('click', () => {
+                    this.speakResponse();
+                });
+                
+                this.copyBtn.addEventListener('click', () => {
+                    this.copyToClipboard();
+                });
+                
+                this.mailClientSelect.addEventListener('change', () => {
+                    if (this.mailClientSelect.value === 'custom') {
+                        this.customUrlInput.style.display = 'block';
+                        this.customUrlLabel.style.display = 'block';
+                    } else {
+                        this.customUrlInput.style.display = 'none';
+                        this.customUrlLabel.style.display = 'none';
+                    }
+                });
 
+                this.sendMailBtn.addEventListener('click', () => {
+                    this.openMailClient();
+                });
+            }
+            
             startRecording() {
                 if (this.recognition) {
                     this.recognizedCommand = '';
                     this.recognizedText.classList.add('hidden');
                     this.recognition.start();
-                    this.isRecording = true;
-                    this.updateVoiceStatus('listening', '音声を聞いています...');
                 }
             }
-
+            
             updateVoiceStatus(type, message) {
                 this.voiceStatus.className = `voice-status ${type}`;
                 this.voiceStatus.textContent = message;
             }
-
+            
             displayRecognizedText(text) {
                 this.recognizedText.textContent = `認識された指示: "${text}"`;
                 this.recognizedText.classList.remove('hidden');
             }
-
+            
             generateResponse() {
                 const emailContent = this.receivedEmail.value.trim();
                 const voiceCommand = this.recognizedCommand.trim();
-
+                
                 if (!emailContent) {
-                    alert('受信メールを入力してください。');
+                    alert('受信メールの内容を入力してください。');
                     return;
                 }
+                
                 if (!voiceCommand) {
-                    alert('音声で指示を録音してください。');
+                    alert('まず音声で返信の指示を録音してください。');
+                    return;
+                }
+                
+                const emailInfo = this.parseEmail(emailContent);
+                const response = this.createResponse(emailInfo, voiceCommand);
+                
+                this.responseText.value = response;
+                // 件名を自動生成してセット
+                let replySubject = 'Re: ';
+                if (emailInfo.subject) {
+                    replySubject += emailInfo.subject.replace(/^(Re:|RE:)\s*/i, '');
+                } else {
+                    replySubject += 'お返事';
+                }
+                this.subjectInput.value = replySubject;
+                
+                this.updateVoiceStatus('ready', '返信を生成しました');
+            }
+            
+            parseEmail(content) {
+                const lines = content.split('\n');
+                let subject = '';
+                let sender = '';
+                let body = '';
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line.startsWith('件名：') || line.startsWith('Subject:')) {
+                        subject = line.split('：')[1] || line.split(':')[1] || '';
+                    } else if (line.startsWith('差出人：') || line.startsWith('From:')) {
+                        sender = line.split('：')[1] || line.split(':')[1] || '';
+                    } else if (line.startsWith('内容：') || line.startsWith('Content:')) {
+                        body = lines.slice(i + 1).join('\n');
+                        break;
+                    }
+                }
+                
+                if (!subject && !sender) {
+                    body = content;
+                }
+                
+                return { subject, sender, body };
+            }
+            
+            createResponse(emailInfo, command) {
+                const currentDate = new Date().toLocaleDateString('ja-JP');
+                let response = '';
+                
+                if (emailInfo.sender) {
+                    response += `${emailInfo.sender} 様\n\n`;
+                } else {
+                    response += 'お疲れ様です。\n\n';
+                }
+                
+                if (command.includes('承諾') || command.includes('了承') || command.includes('OK') || command.includes('大丈夫')) {
+                    response += 'ご連絡いただきありがとうございます。\n承知いたしました。問題ございません。\n\n';
+                } else if (command.includes('断る') || command.includes('無理') || command.includes('できない')) {
+                    response += 'ご連絡いただきありがとうございます。\n申し訳ございませんが、お受けすることが難しい状況です。\n\n';
+                } else if (command.includes('時間変更') || command.includes('日程変更') || command.includes('延期')) {
+                    response += 'ご連絡いただきありがとうございます。\n日程の件、承知いたしました。変更後のスケジュールをお教えください。\n\n';
+                } else if (command.includes('確認') || command.includes('詳細') || command.includes('質問')) {
+                    response += 'ご連絡いただきありがとうございます。\nいくつか確認させていただきたい点がございます。詳細をお教えいただけますでしょうか。\n\n';
+                } else if (command.includes('感謝') || command.includes('ありがとう') || command.includes('お礼')) {
+                    response += 'ご連絡いただきありがとうございます。\nこちらこそ、いつもお世話になっております。\n\n';
+                } else {
+                    response += 'ご連絡いただきありがとうございます。\n' + command + '\n\n';
+                }
+                
+                response += 'ご不明な点がございましたら、お気軽にお声がけください。\nよろしくお願いいたします。\n\n' + currentDate;
+                
+                return response;
+            }
+            
+            speakResponse() {
+                const text = this.responseText.value;
+                if (!text) {
+                    alert('返信メールを先に生成してください。');
+                    return;
+                }
+                
+                this.synthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                
+                utterance.onstart = () => {
+                    this.speakBtn.textContent = '読み上げ中...';
+                    this.speakBtn.disabled = true;
+                };
+                
+                utterance.onend = () => {
+                    this.speakBtn.textContent = '返信を音声で読み上げ';
+                    this.speakBtn.disabled = false;
+                };
+                
+                utterance.onerror = () => {
+                    this.speakBtn.textContent = '返信を音声で読み上げ';
+                    this.speakBtn.disabled = false;
+                    alert('音声読み上げでエラーが発生しました。');
+                };
+                
+                this.synthesis.speak(utterance);
+            }
+            
+            copyToClipboard() {
+                const text = this.responseText.value;
+                if (!text) {
+                    alert('返信メールを先に生成してください。');
+                    return;
+                }
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = this.copyBtn.textContent;
+                    this.copyBtn.textContent = 'コピーしました！';
+                    this.copyBtn.style.background = 'linear-gradient(45deg, #22c55e, #16a34a)';
+                    
+                    setTimeout(() => {
+                        this.copyBtn.textContent = originalText;
+                        this.copyBtn.style.background = 'linear-gradient(45deg, #11998e, #38ef7d)';
+                    }, 2000);
+                }).catch(() => {
+                    alert('クリップボードへのコピーに失敗しました。');
+                });
+            }
+            
+            openMailClient() {
+                const subject = encodeURIComponent(this.subjectInput.value.trim());
+                const body = encodeURIComponent(this.responseText.value.trim());
+                const client = this.mailClientSelect.value;
+
+                if (!subject) {
+                    alert('件名を入力してください。');
+                    return;
+                }
+                if (!body) {
+                    alert('返信メールを生成してください。');
                     return;
                 }
 
-                const reply = `件名: Re: (自動返信)\n\n${voiceCommand}\n\n${emailContent}`;
-                this.responseText.value = reply;
+                let url = '';
+
+                switch (client) {
+                    case 'gmail':
+                        url = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+                        break;
+                    case 'outlook':
+                        url = `https://outlook.office.com/mail/deeplink/compose?subject=${subject}&body=${body}`;
+                        break;
+                    case 'applemail':
+                        url = `mailto:?subject=${subject}&body=${body}`;
+                        break;
+                    case 'custom':
+                        const template = this.customUrlInput.value.trim();
+                        if (!template) {
+                            alert('カスタムURLを入力してください。');
+                            return;
+                        }
+                        url = template.replaceAll('{{subject}}', subject).replaceAll('{{body}}', body);
+                        break;
+                    default:
+                        alert('メールアプリを選択してください。');
+                        return;
+                }
+
+                window.open(url, '_blank');
             }
         }
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             new VoiceEmailTool();
         });
