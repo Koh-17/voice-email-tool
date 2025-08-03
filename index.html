@@ -42,14 +42,6 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
         .email-input, .response-text {
             width: 100%;
             min-height: 150px;
@@ -59,12 +51,7 @@
             font-size: 14px;
             resize: vertical;
         }
-        .voice-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
+        .voice-controls { display: flex; flex-direction: column; gap: 15px; align-items: center; }
         .voice-btn {
             background: linear-gradient(45deg, #ff6b6b, #ee5a52);
             color: white;
@@ -81,13 +68,7 @@
         .voice-status.ready { background: rgba(34,197,94,0.1); color: #22c55e; }
         .recognized-text { background: rgba(102,126,234,0.1); padding: 15px; border-radius: 10px; margin-top: 15px; }
         .hidden { display: none; }
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+        .action-buttons { display: flex; gap: 15px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         .btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
         .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
         .btn-secondary { background: linear-gradient(45deg, #11998e, #38ef7d); color: white; }
@@ -119,8 +100,6 @@
             <textarea id="responseText" class="response-text" placeholder="返信メールがここに表示されます" readonly></textarea>
             <div class="action-buttons">
                 <button class="btn btn-primary" id="generateBtn">返信を生成</button>
-                <button class="btn btn-secondary" id="speakBtn">返信を音声で読み上げ</button>
-                <button class="btn btn-primary" id="copyBtn">コピー</button>
             </div>
         </div>
     </div>
@@ -129,7 +108,6 @@
         class VoiceEmailTool {
             constructor() {
                 this.recognition = null;
-                this.synthesis = window.speechSynthesis;
                 this.isRecording = false;
                 this.recognizedCommand = '';
                 this.initElements();
@@ -144,8 +122,6 @@
                 this.receivedEmail = document.getElementById('receivedEmail');
                 this.responseText = document.getElementById('responseText');
                 this.generateBtn = document.getElementById('generateBtn');
-                this.speakBtn = document.getElementById('speakBtn');
-                this.copyBtn = document.getElementById('copyBtn');
             }
 
             initSpeechRecognition() {
@@ -160,45 +136,16 @@
                     this.recognition.continuous = false;
                     this.recognition.interimResults = true;
 
-                    this.recognition.onstart = () => {
-                        console.log('🎤 録音開始イベントが発火しました');
-                        this.isRecording = true;
-                        this.updateVoiceStatus('listening', '音声を聞いています...');
-                        this.voiceBtn.textContent = '録音を停止';
-                        this.voiceBtn.classList.add('recording');
-                    };
-
                     this.recognition.onresult = (event) => {
-                        console.log('✅ onresult発火', event.results);
                         let transcript = '';
                         for (let i = event.resultIndex; i < event.results.length; i++) {
                             transcript += event.results[i][0].transcript;
                         }
                         if (event.results[event.results.length - 1].isFinal) {
-                            console.log('🎤 最終認識結果:', transcript);
                             this.recognizedCommand = transcript;
                             this.displayRecognizedText(transcript);
                         }
                     };
-
-                    this.recognition.onend = () => {
-                        console.log('🛑 録音終了イベント');
-                        this.isRecording = false;
-                        this.updateVoiceStatus('ready', '準備完了');
-                        this.voiceBtn.textContent = '音声録音を開始';
-                        this.voiceBtn.classList.remove('recording');
-                    };
-
-                    this.recognition.onerror = (event) => {
-                        console.error('❌ 音声認識エラー', event.error);
-                        this.updateVoiceStatus('ready', 'エラーが発生しました');
-                        this.isRecording = false;
-                        this.voiceBtn.textContent = '音声録音を開始';
-                        this.voiceBtn.classList.remove('recording');
-                    };
-                } else {
-                    console.warn('❌ 音声認識が使えません');
-                    this.voiceBtn.disabled = true;
                 }
             }
 
@@ -206,10 +153,14 @@
                 this.voiceBtn.addEventListener('click', () => {
                     if (this.isRecording) {
                         this.recognition.stop();
+                        this.isRecording = false;
                     } else {
-                        console.log('▶️ startRecording() 呼び出し');
                         this.startRecording();
                     }
+                });
+
+                this.generateBtn.addEventListener('click', () => {
+                    this.generateResponse();
                 });
             }
 
@@ -218,6 +169,8 @@
                     this.recognizedCommand = '';
                     this.recognizedText.classList.add('hidden');
                     this.recognition.start();
+                    this.isRecording = true;
+                    this.updateVoiceStatus('listening', '音声を聞いています...');
                 }
             }
 
@@ -229,6 +182,23 @@
             displayRecognizedText(text) {
                 this.recognizedText.textContent = `認識された指示: "${text}"`;
                 this.recognizedText.classList.remove('hidden');
+            }
+
+            generateResponse() {
+                const emailContent = this.receivedEmail.value.trim();
+                const voiceCommand = this.recognizedCommand.trim();
+
+                if (!emailContent) {
+                    alert('受信メールを入力してください。');
+                    return;
+                }
+                if (!voiceCommand) {
+                    alert('音声で指示を録音してください。');
+                    return;
+                }
+
+                const reply = `件名: Re: (自動返信)\n\n${voiceCommand}\n\n${emailContent}`;
+                this.responseText.value = reply;
             }
         }
 
