@@ -162,6 +162,33 @@
 </head>
 <body>
     <div class="container">
+        <!-- ここは既存のHTML -->
+
+    </div>
+
+    <!-- ✅ デバッグ用スクリプト -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const status = document.createElement('div');
+        status.style.background = '#fff';
+        status.style.padding = '10px';
+        status.style.margin = '10px';
+        status.style.border = '2px solid #000';
+        status.style.fontWeight = 'bold';
+        document.body.prepend(status);
+
+        if ('webkitSpeechRecognition' in window) {
+            status.innerText = '✅ webkitSpeechRecognition が使えます';
+        } else if ('SpeechRecognition' in window) {
+            status.innerText = '✅ SpeechRecognition が使えます';
+        } else {
+            status.innerText = '❌ このブラウザは音声認識をサポートしていません';
+        }
+    });
+    </script>
+
+    </div>
+    <div class="container">
         <div class="header">
             <h1>🎤 音声メール返信ツール</h1>
             <p>受信メールを入力し、音声で返信内容を指示してください</p>
